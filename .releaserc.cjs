@@ -10,12 +10,12 @@ module.exports = {
       {
         replacements: [
           {
-            files: ["dist/power-flow-card.js"],
+            files: ["power-flow-card.js"],
             from: /Power Flow Card v(\d+\.\d+\.\d+)/,
             to: "Power Flow Card v${nextRelease.version}",
             results: [
               {
-                file: "dist/power-flow-card.js",
+                file: "power-flow-card.js",
                 hasChanged: true,
                 numMatches: 2,
                 numReplacements: 2,
@@ -36,7 +36,7 @@ module.exports = {
     [
       "@semantic-release/github",
       {
-        assets: "dist/*.js",
+        assets: "power-flow-card.js",
       },
     ],
   ],

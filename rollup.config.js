@@ -9,7 +9,7 @@ import typescript from "@rollup/plugin-typescript";
 const dev = process.env.ROLLUP_WATCH;
 
 const serveOptions = {
-  contentBase: ["./dist"],
+  contentBase: ["./"],
   host: "0.0.0.0",
   port: 5000,
   allowCrossOrigin: true,
@@ -23,7 +23,8 @@ export default [
     input: "src/power-flow-card.ts",
     output: [
       {
-        dir: "./dist",
+        file: "./power-flow-card.js",
+        format: "es",
       },
     ],
     plugins: [
