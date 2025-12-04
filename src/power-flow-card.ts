@@ -19,12 +19,16 @@ import { formatNumber, HomeAssistant } from "custom-card-helpers";
 import { css, html, LitElement, svg, TemplateResult } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
-import { PowerFlowCardConfig } from "./power-flow-card-config.js";
+import {
+  PowerFlowCardConfig,
+  CustomIcon,
+} from "./power-flow-card-config.js";
 import {
   coerceNumber,
   coerceStringArray,
   round,
   isNumberValue,
+  isValidDashboardLink,
 } from "./utils.js";
 import { EntityType } from "./type.js";
 import { logError } from "./logging.js";
@@ -120,6 +124,31 @@ export class PowerFlowCard extends LitElement {
       this.hass.locale
     );
     return `${v} ${isKW ? "kW" : "W"}`;
+  };
+
+  private renderIcon = (
+    type: "solar" | "grid" | "home" | "battery" | "gas" | "water",
+    defaultIcon: string
+  ) => {
+    const customIcon: CustomIcon | undefined = this._config.icons?.[type];
+
+    if (customIcon?.image) {
+      return html`<img
+        class="custom-image"
+        src=${customIcon.image}
+        alt=${type}
+      />`;
+    }
+
+    const iconPath = customIcon?.icon
+      ? undefined
+      : defaultIcon;
+
+    if (customIcon?.icon) {
+      return html`<ha-icon .icon=${customIcon.icon}></ha-icon>`;
+    }
+
+    return html`<ha-svg-icon .path=${iconPath}></ha-svg-icon>`;
   };
 
   protected render(): TemplateResult {
@@ -364,7 +393,7 @@ export class PowerFlowCard extends LitElement {
                         )}</span
                       >
                       <div class="circle">
-                        <ha-svg-icon .path=${mdiSolarPower}></ha-svg-icon>
+                        ${this.renderIcon("solar", mdiSolarPower)}
                         <span class="solar">
                           ${this.displayValue(totalSolarProduction)}</span
                         >
@@ -381,7 +410,7 @@ export class PowerFlowCard extends LitElement {
                         )}</span
                       >
                       <div class="circle">
-                        <ha-svg-icon .path=${mdiFire}></ha-svg-icon>
+                        ${this.renderIcon("gas", mdiFire)}
                         ${formatNumber(gasUsage || 0, this.hass.locale, {
                           maximumFractionDigits: 1,
                         })}
@@ -414,7 +443,7 @@ export class PowerFlowCard extends LitElement {
                         )}</span
                       >
                       <div class="circle">
-                        <ha-svg-icon .path=${mdiWater}></ha-svg-icon>
+                        ${this.renderIcon("water", mdiWater)}
                         ${formatNumber(waterUsage || 0, this.hass.locale, {
                           maximumFractionDigits: 1,
                         })}
@@ -446,7 +475,7 @@ export class PowerFlowCard extends LitElement {
             ${hasGrid
               ? html` <div class="circle-container grid">
                   <div class="circle">
-                    <ha-svg-icon .path=${mdiTransmissionTower}></ha-svg-icon>
+                    ${this.renderIcon("grid", mdiTransmissionTower)}
                     ${returnedToGrid !== null
                       ? html`<span class="return">
                           <ha-svg-icon
@@ -473,7 +502,7 @@ export class PowerFlowCard extends LitElement {
               : html`<div class="spacer"></div>`}
             <div class="circle-container home">
               <div class="circle">
-                <ha-svg-icon .path=${mdiHome}></ha-svg-icon>
+                ${this.renderIcon("home", mdiHome)}
                 ${this.displayValue(totalHomeConsumption)}
                 <svg>
                   ${homeSolarCircumference !== undefined
@@ -553,7 +582,7 @@ export class PowerFlowCard extends LitElement {
                               )}%
                             </span>`
                           : null}
-                        <ha-svg-icon .path=${batteryIcon}></ha-svg-icon>
+                        ${this.renderIcon("battery", batteryIcon)}
                         <span class="battery-in">
                           <ha-svg-icon
                             class="small"
@@ -597,7 +626,7 @@ export class PowerFlowCard extends LitElement {
                           : ""}
                       </svg>
                       <div class="circle">
-                        <ha-svg-icon .path=${mdiWater}></ha-svg-icon>
+                        ${this.renderIcon("water", mdiWater)}
                         ${formatNumber(waterUsage || 0, this.hass.locale, {
                           maximumFractionDigits: 1,
                         })}
@@ -864,7 +893,7 @@ export class PowerFlowCard extends LitElement {
               </div>`
             : ""}
         </div>
-        ${this._config.dashboard_link
+        ${isValidDashboardLink(this._config.dashboard_link)
           ? html`
               <div class="card-actions">
                 <a href=${this._config.dashboard_link}
@@ -884,9 +913,23 @@ export class PowerFlowCard extends LitElement {
   static styles = css`
     :host {
       --mdc-icon-size: 24px;
+      --glass-background: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: rgba(0, 0, 0, 0.1);
+      --glass-blur: 12px;
+    }
+    ha-card {
+      background: var(--glass-background) !important;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border) !important;
+      border-radius: 16px !important;
+      box-shadow: 0 8px 32px var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     .card-content {
       position: relative;
+      padding: 16px;
     }
     .lines {
       position: absolute;
@@ -951,7 +994,7 @@ export class PowerFlowCard extends LitElement {
       height: 80px;
       border-radius: 50%;
       box-sizing: border-box;
-      border: 2px solid;
+      border: 1.5px solid;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -962,22 +1005,47 @@ export class PowerFlowCard extends LitElement {
       position: relative;
       text-decoration: none;
       color: var(--primary-text-color);
+      background: var(--glass-background);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    ha-svg-icon {
+    .circle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 24px var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    ha-svg-icon,
+    ha-icon {
       padding-bottom: 2px;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
     }
     ha-svg-icon.small {
       --mdc-icon-size: 12px;
     }
+    .custom-image {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      margin-bottom: 2px;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+      border-radius: 4px;
+    }
     .label {
       color: var(--secondary-text-color);
       font-size: 12px;
+      margin-top: 6px;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
     line,
     path {
       stroke: var(--primary-text-color);
-      stroke-width: 1;
+      stroke-width: 1.5;
       fill: none;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
     }
     .circle svg {
       position: absolute;
@@ -995,9 +1063,13 @@ export class PowerFlowCard extends LitElement {
     circle.gas {
       stroke-width: 4;
       fill: var(--energy-gas-color);
+      filter: drop-shadow(0 0 6px var(--energy-gas-color));
     }
     .gas .circle {
       border-color: var(--energy-gas-color);
+      box-shadow: 0 4px 16px var(--glass-shadow),
+        0 0 20px rgba(255, 152, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .water path,
     .water circle {
@@ -1006,15 +1078,22 @@ export class PowerFlowCard extends LitElement {
     circle.water {
       stroke-width: 4;
       fill: var(--energy-water-color);
+      filter: drop-shadow(0 0 6px var(--energy-water-color));
     }
     .water .circle {
       border-color: var(--energy-water-color);
+      box-shadow: 0 4px 16px var(--glass-shadow),
+        0 0 20px rgba(33, 150, 243, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .solar {
       color: var(--primary-text-color);
     }
     .solar .circle {
       border-color: var(--energy-solar-color);
+      box-shadow: 0 4px 16px var(--glass-shadow),
+        0 0 20px rgba(255, 193, 7, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     circle.solar,
     path.solar {
@@ -1023,9 +1102,13 @@ export class PowerFlowCard extends LitElement {
     circle.solar {
       stroke-width: 4;
       fill: var(--energy-solar-color);
+      filter: drop-shadow(0 0 8px var(--energy-solar-color));
     }
     .battery .circle {
       border-color: var(--energy-battery-in-color);
+      box-shadow: 0 4px 16px var(--glass-shadow),
+        0 0 20px rgba(76, 175, 80, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     circle.battery,
     path.battery {
@@ -1038,6 +1121,7 @@ export class PowerFlowCard extends LitElement {
     circle.battery-home {
       stroke-width: 4;
       fill: var(--energy-battery-out-color);
+      filter: drop-shadow(0 0 6px var(--energy-battery-out-color));
     }
     path.battery-solar,
     circle.battery-solar {
@@ -1046,6 +1130,7 @@ export class PowerFlowCard extends LitElement {
     circle.battery-solar {
       stroke-width: 4;
       fill: var(--energy-battery-in-color);
+      filter: drop-shadow(0 0 6px var(--energy-battery-in-color));
     }
     .battery-in {
       color: var(--energy-battery-in-color);
@@ -1068,12 +1153,16 @@ export class PowerFlowCard extends LitElement {
     circle.battery-to-grid {
       stroke-width: 4;
       fill: var(--energy-grid-return-color);
+      filter: drop-shadow(0 0 6px var(--energy-grid-return-color));
     }
     .return {
       color: var(--energy-grid-return-color);
     }
     .grid .circle {
       border-color: var(--energy-grid-consumption-color);
+      box-shadow: 0 4px 16px var(--glass-shadow),
+        0 0 20px rgba(244, 67, 54, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .consumption {
       color: var(--energy-grid-consumption-color);
@@ -1087,17 +1176,21 @@ export class PowerFlowCard extends LitElement {
     circle.battery-from-grid {
       stroke-width: 4;
       fill: var(--energy-grid-consumption-color);
+      filter: drop-shadow(0 0 6px var(--energy-grid-consumption-color));
     }
     .home .circle {
       border-width: 0;
       border-color: var(--primary-color);
+      box-shadow: 0 4px 16px var(--glass-shadow),
+        0 0 20px rgba(3, 169, 244, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .home .circle.border {
-      border-width: 2px;
+      border-width: 1.5px;
     }
     .circle svg circle {
       animation: rotate-in 0.6s ease-in;
-      transition: stroke-dashoffset 0.4s, stroke-dasharray 0.4s;
+      transition: stroke-dashoffset 0.4s ease, stroke-dasharray 0.4s ease;
       fill: none;
     }
     @keyframes rotate-in {
@@ -1106,8 +1199,15 @@ export class PowerFlowCard extends LitElement {
         stroke-dasharray: 238.76104;
       }
     }
+    .card-actions {
+      border-top: 1px solid var(--glass-border);
+      padding: 8px 16px;
+    }
     .card-actions a {
       text-decoration: none;
+    }
+    .card-actions mwc-button {
+      --mdc-theme-primary: var(--primary-text-color);
     }
   `;
 }

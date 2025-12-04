@@ -1,6 +1,11 @@
 import { LovelaceCardConfig } from "custom-card-helpers";
 import { ComboEntity } from "./type.js";
 
+export interface CustomIcon {
+  icon?: string;
+  image?: string;
+}
+
 export interface PowerFlowCardConfig extends LovelaceCardConfig {
   entities: {
     battery?: string | ComboEntity;
@@ -9,6 +14,14 @@ export interface PowerFlowCardConfig extends LovelaceCardConfig {
     solar?: string;
     gas?: string;
     water?: string;
+  };
+  icons?: {
+    battery?: CustomIcon;
+    grid?: CustomIcon;
+    home?: CustomIcon;
+    solar?: CustomIcon;
+    gas?: CustomIcon;
+    water?: CustomIcon;
   };
   dashboard_link?: string;
   inverted_entities: string | string[];
