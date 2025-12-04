@@ -66,6 +66,30 @@ I recommend looking at the [Example usage section](#example-usage) to understand
 | min_flow_rate     | `number` |     .75      | Represents the fastest amount of time in seconds for a flow dot to travel from one end to the other, see [flow formula](#flow-formula).                                      |
 | max_flow_rate     | `number` |      6       | Represents the slowest amount of time in seconds for a flow dot to travel from one end to the other, see [flow formula](#flow-formula).                                      |
 | watt_threshold    | `number` |      0       | The number of watts to display before converting to and displaying kilowatts. Setting of 0 will always display in kilowatts.                                                 |
+| icons             | `object` |              | Customize icons for each entity type, see [icons object](#icons-object) for additional options.                                                                              |
+
+#### Icons object
+
+You can customize the icons displayed for each entity type by using either Material Design Icons (MDI) or custom images.
+
+| Name    | Type     | Description                              |
+| ------- | -------- | ---------------------------------------- |
+| battery | `object` | Custom icon configuration for battery    |
+| grid    | `object` | Custom icon configuration for grid       |
+| home    | `object` | Custom icon configuration for home       |
+| solar   | `object` | Custom icon configuration for solar      |
+| gas     | `object` | Custom icon configuration for gas        |
+| water   | `object` | Custom icon configuration for water      |
+
+Each icon object supports the following properties:
+
+| Name       | Type     | Default | Description                                                                                      |
+| ---------- | -------- | :-----: | ------------------------------------------------------------------------------------------------ |
+| icon       | `string` |         | MDI icon name (e.g., `mdi:solar-panel`)                                                          |
+| image      | `string` |         | URL to a custom image. Can be a local path (e.g., `/local/images/solar.png`) or an external URL. |
+| image_size | `number` |   32    | Size of the custom image in pixels (width and height).                                           |
+
+**Note:** If both `icon` and `image` are specified, `image` takes priority.
 
 #### Entities object
 
@@ -133,6 +157,49 @@ entities:
     consumption: sensor.grid_out
     production: sensor.grid_in
   solar: sensor.solar_out
+```
+
+#### Custom Icons Example
+
+Using custom [Material Design Icons](https://pictogrammers.com/library/mdi/):
+
+```yaml
+type: custom:power-flow-card
+entities:
+  grid: sensor.grid_in_out
+  solar: sensor.solar_out
+icons:
+  solar:
+    icon: mdi:white-balance-sunny
+  grid:
+    icon: mdi:flash
+  home:
+    icon: mdi:home-variant
+  battery:
+    icon: mdi:battery-high
+```
+
+#### Custom Images Example
+
+Using custom images (place images in your `config/www` folder):
+
+```yaml
+type: custom:power-flow-card
+entities:
+  grid: sensor.grid_in_out
+  solar: sensor.solar_out
+  battery: sensor.battery_in_out
+icons:
+  solar:
+    image: /local/images/solar-panel.png
+    image_size: 40  # Custom size in pixels
+  battery:
+    image: /local/images/battery.png
+  home:
+    image: /local/images/house.png
+    image_size: 36
+  grid:
+    icon: mdi:flash  # Can mix icons and images
 ```
 
 ### Flow Formula

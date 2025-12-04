@@ -133,16 +133,16 @@ export class PowerFlowCard extends LitElement {
     const customIcon: CustomIcon | undefined = this._config.icons?.[type];
 
     if (customIcon?.image) {
+      const size = customIcon.image_size ?? 32;
       return html`<img
         class="custom-image"
         src=${customIcon.image}
         alt=${type}
+        style="width: ${size}px; height: ${size}px;"
       />`;
     }
 
-    const iconPath = customIcon?.icon
-      ? undefined
-      : defaultIcon;
+    const iconPath = customIcon?.icon ? undefined : defaultIcon;
 
     if (customIcon?.icon) {
       return html`<ha-icon .icon=${customIcon.icon}></ha-icon>`;
@@ -917,6 +917,23 @@ export class PowerFlowCard extends LitElement {
       --glass-border: rgba(255, 255, 255, 0.2);
       --glass-shadow: rgba(0, 0, 0, 0.1);
       --glass-blur: 12px;
+      /* MUI Color Palette */
+      --mui-solar: #ffc107;
+      --mui-solar-glow: rgba(255, 193, 7, 0.4);
+      --mui-grid-consumption: #f44336;
+      --mui-grid-consumption-glow: rgba(244, 67, 54, 0.4);
+      --mui-grid-return: #4caf50;
+      --mui-grid-return-glow: rgba(76, 175, 80, 0.4);
+      --mui-battery-in: #8bc34a;
+      --mui-battery-in-glow: rgba(139, 195, 74, 0.4);
+      --mui-battery-out: #009688;
+      --mui-battery-out-glow: rgba(0, 150, 136, 0.4);
+      --mui-home: #2196f3;
+      --mui-home-glow: rgba(33, 150, 243, 0.4);
+      --mui-gas: #ff9800;
+      --mui-gas-glow: rgba(255, 152, 0, 0.4);
+      --mui-water: #00bcd4;
+      --mui-water-glow: rgba(0, 188, 212, 0.4);
     }
     ha-card {
       background: var(--glass-background) !important;
@@ -1026,8 +1043,6 @@ export class PowerFlowCard extends LitElement {
       --mdc-icon-size: 12px;
     }
     .custom-image {
-      width: 24px;
-      height: 24px;
       object-fit: contain;
       margin-bottom: 2px;
       filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
@@ -1058,131 +1073,131 @@ export class PowerFlowCard extends LitElement {
     }
     .gas path,
     .gas circle {
-      stroke: var(--energy-gas-color);
+      stroke: var(--mui-gas);
     }
     circle.gas {
       stroke-width: 4;
-      fill: var(--energy-gas-color);
-      filter: drop-shadow(0 0 6px var(--energy-gas-color));
+      fill: var(--mui-gas);
+      filter: drop-shadow(0 0 8px var(--mui-gas-glow));
     }
     .gas .circle {
-      border-color: var(--energy-gas-color);
+      border-color: var(--mui-gas);
       box-shadow: 0 4px 16px var(--glass-shadow),
-        0 0 20px rgba(255, 152, 0, 0.15),
+        0 0 20px var(--mui-gas-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .water path,
     .water circle {
-      stroke: var(--energy-water-color);
+      stroke: var(--mui-water);
     }
     circle.water {
       stroke-width: 4;
-      fill: var(--energy-water-color);
-      filter: drop-shadow(0 0 6px var(--energy-water-color));
+      fill: var(--mui-water);
+      filter: drop-shadow(0 0 8px var(--mui-water-glow));
     }
     .water .circle {
-      border-color: var(--energy-water-color);
+      border-color: var(--mui-water);
       box-shadow: 0 4px 16px var(--glass-shadow),
-        0 0 20px rgba(33, 150, 243, 0.15),
+        0 0 20px var(--mui-water-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .solar {
       color: var(--primary-text-color);
     }
     .solar .circle {
-      border-color: var(--energy-solar-color);
+      border-color: var(--mui-solar);
       box-shadow: 0 4px 16px var(--glass-shadow),
-        0 0 20px rgba(255, 193, 7, 0.2),
+        0 0 20px var(--mui-solar-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     circle.solar,
     path.solar {
-      stroke: var(--energy-solar-color);
+      stroke: var(--mui-solar);
     }
     circle.solar {
       stroke-width: 4;
-      fill: var(--energy-solar-color);
-      filter: drop-shadow(0 0 8px var(--energy-solar-color));
+      fill: var(--mui-solar);
+      filter: drop-shadow(0 0 8px var(--mui-solar-glow));
     }
     .battery .circle {
-      border-color: var(--energy-battery-in-color);
+      border-color: var(--mui-battery-in);
       box-shadow: 0 4px 16px var(--glass-shadow),
-        0 0 20px rgba(76, 175, 80, 0.15),
+        0 0 20px var(--mui-battery-in-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     circle.battery,
     path.battery {
-      stroke: var(--energy-battery-out-color);
+      stroke: var(--mui-battery-out);
     }
     path.battery-home,
     circle.battery-home {
-      stroke: var(--energy-battery-out-color);
+      stroke: var(--mui-battery-out);
     }
     circle.battery-home {
       stroke-width: 4;
-      fill: var(--energy-battery-out-color);
-      filter: drop-shadow(0 0 6px var(--energy-battery-out-color));
+      fill: var(--mui-battery-out);
+      filter: drop-shadow(0 0 8px var(--mui-battery-out-glow));
     }
     path.battery-solar,
     circle.battery-solar {
-      stroke: var(--energy-battery-in-color);
+      stroke: var(--mui-battery-in);
     }
     circle.battery-solar {
       stroke-width: 4;
-      fill: var(--energy-battery-in-color);
-      filter: drop-shadow(0 0 6px var(--energy-battery-in-color));
+      fill: var(--mui-battery-in);
+      filter: drop-shadow(0 0 8px var(--mui-battery-in-glow));
     }
     .battery-in {
-      color: var(--energy-battery-in-color);
+      color: var(--mui-battery-in);
     }
     .battery-out {
-      color: var(--energy-battery-out-color);
+      color: var(--mui-battery-out);
     }
     path.battery-from-grid {
-      stroke: var(--energy-grid-consumption-color);
+      stroke: var(--mui-grid-consumption);
     }
     path.battery-to-grid {
-      stroke: var(--energy-grid-return-color);
+      stroke: var(--mui-grid-return);
     }
     path.return,
     circle.return,
     circle.battery-to-grid {
-      stroke: var(--energy-grid-return-color);
+      stroke: var(--mui-grid-return);
     }
     circle.return,
     circle.battery-to-grid {
       stroke-width: 4;
-      fill: var(--energy-grid-return-color);
-      filter: drop-shadow(0 0 6px var(--energy-grid-return-color));
+      fill: var(--mui-grid-return);
+      filter: drop-shadow(0 0 8px var(--mui-grid-return-glow));
     }
     .return {
-      color: var(--energy-grid-return-color);
+      color: var(--mui-grid-return);
     }
     .grid .circle {
-      border-color: var(--energy-grid-consumption-color);
+      border-color: var(--mui-grid-consumption);
       box-shadow: 0 4px 16px var(--glass-shadow),
-        0 0 20px rgba(244, 67, 54, 0.15),
+        0 0 20px var(--mui-grid-consumption-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .consumption {
-      color: var(--energy-grid-consumption-color);
+      color: var(--mui-grid-consumption);
     }
     circle.grid,
     circle.battery-from-grid,
     path.grid {
-      stroke: var(--energy-grid-consumption-color);
+      stroke: var(--mui-grid-consumption);
     }
     circle.grid,
     circle.battery-from-grid {
       stroke-width: 4;
-      fill: var(--energy-grid-consumption-color);
-      filter: drop-shadow(0 0 6px var(--energy-grid-consumption-color));
+      fill: var(--mui-grid-consumption);
+      filter: drop-shadow(0 0 8px var(--mui-grid-consumption-glow));
     }
     .home .circle {
       border-width: 0;
-      border-color: var(--primary-color);
+      border-color: var(--mui-home);
       box-shadow: 0 4px 16px var(--glass-shadow),
-        0 0 20px rgba(3, 169, 244, 0.15),
+        0 0 20px var(--mui-home-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     .home .circle.border {

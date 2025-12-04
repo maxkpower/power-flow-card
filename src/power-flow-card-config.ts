@@ -4,6 +4,7 @@ import { ComboEntity } from "./type.js";
 export interface CustomIcon {
   icon?: string;
   image?: string;
+  image_size?: number;
 }
 
 export interface PowerFlowCardConfig extends LovelaceCardConfig {
