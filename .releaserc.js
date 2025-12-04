@@ -30,7 +30,7 @@ module.exports = {
     [
       "@semantic-release/git",
       {
-        assets: ["CHANGELOG.md", "README.md", "package.json", "pnpm-lock.yaml"],
+        assets: ["CHANGELOG.md", "README.md", "package.json", "package-lock.json"],
       },
     ],
     [

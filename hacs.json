@@ -1,5 +1,6 @@
 {
   "name": "Power Flow Card",
   "render_readme": true,
-  "homeassistant": "2021.8.0"
+  "filename": "power-flow-card.js",
+  "homeassistant": "2022.4.0"
 }
